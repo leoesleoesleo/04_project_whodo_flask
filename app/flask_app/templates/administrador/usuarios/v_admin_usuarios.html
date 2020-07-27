@@ -1,0 +1,282 @@
+<script type="text/javascript">
+
+function modal_eliminarusuario(id,nombre) {
+  $('p#id_usuario').html(id);
+  $('small#usuario').html(nombre); 
+}
+
+function eliminarusuario() {
+  var id_usuario      = $('p#id_usuario').text();
+    $.ajax({
+        url: '/c_eliminarusuario',
+        type: "POST",
+        data: {'id_usuario':id_usuario},
+        beforeSend: show_loading(),
+        dataType: "text",
+        success: function(res){
+            if (res == 'Registrodelete') {
+              $.notify("Usuario Eliminado Correctamente", "success");
+              hide_loading(); 
+              hide_modal_insert();  
+              v_admin_usuarios();                                                                
+            }
+            if (res == 'Error') {
+              $.notify("Hubo un error en el proceso", "error");
+              hide_loading();   
+            }             
+        },
+        error: function(e) {
+           console.error(e);
+           $.notify("Hubo un error en la petición del proceso", "error");
+           hide_loading();
+        }
+    }); 
+}
+
+function modal_modificarusuario(id,usuario,nombre,apellido,cedula,fecha_nac,telefono,direccion,descripcion,ciudad,activo) {   
+      $.ajax({
+          url: '/c_modal_actualizar_cliente',
+          type: "post",
+          data: {'id':id,'usuario':usuario,'nombre':nombre,'apellido':apellido,'cedula':cedula,'fecha_nac':fecha_nac,'telefono':telefono,'direccion':direccion,'descripcion':descripcion,'ciudad':ciudad,'activo':activo},
+          beforeSend: show_loading(),
+          dataType: "text",
+          success: function(res){
+              $('div#contenidofromactualizarcliente').html(res);
+              hide_loading();                
+          }
+      });
+    }
+
+function actualizar_usuario(id_usuario,nombre,apellido,cedula,fecha_nac,descripcion,usuario,ciuda,activo) {
+  var id_usuario      = $('small#id_usuario').text(); 
+  var nombre_         = $('input#_nombre').val(); 
+  var apellido_       = $('input#_appellido').val(); 
+  var cedula_         = $('input#_cedula').val(); 
+  var fecha_nac_      = $('input#_fecha_nac').val(); 
+  var descripcion_    = $('textarea#_descripcion').val(); 
+  var usuario_        = $('input#_usuario').val(); 
+  var ciudad_         = $('select#ciudad').val();
+  var activo_         = $('select#estado').val();
+ 
+
+  if (nombre_ == '') {
+        var _nombre = nombre
+      } else {
+        var _nombre = nombre_
+      }
+  
+  if (apellido_ == '') {
+        var _apellido = apellido
+      } else {
+        var _apellido = apellido_
+      }
+
+  if (cedula_ == '') {
+        var _cedula = cedula
+      } else {
+        var _cedula = cedula_
+      }
+      
+  if (fecha_nac_ == '') {
+        var _fecha_nac = fecha_nac
+      } else {
+        var _fecha_nac = fecha_nac_
+      }
+      
+  if (descripcion_ == '') {
+        var _descripcion = descripcion
+      } else {
+        var _descripcion = descripcion_
+      }
+
+  if (usuario_ == '') {
+        var _usuario = usuario
+      } else {
+        var _usuario = usuario_
+      }
+
+  if (ciudad_ == '-- Seleccione Ciudad --') {
+        var _ciudad = ciuda
+      } else {
+        var _ciudad = ciudad_
+      }  
+
+  if (activo_ == 0) {
+        var _activo = activo
+      } else {
+        var _activo = activo_
+      }    
+
+
+  /*
+  alert(id_usuario);
+  alert(_nombre);
+  alert(_apellido);
+  alert(_cedula);
+  alert(_fecha_nac);
+  alert(_descripcion);
+  alert(_usuario);
+  alert(_ciudad);
+  */
+
+    $.ajax({
+        url: '/c_actualizar_usuario',
+        type: "POST",
+        data: {'id_usuario':id_usuario,'_nombre':_nombre,'_apellido':_apellido,'_cedula':_cedula,'_fecha_nac':_fecha_nac,'_descripcion':_descripcion,'_usuario':_usuario,'_ciudad':_ciudad,'_activo':_activo},
+        beforeSend: show_loading(),
+        dataType: "text",
+        success: function(res){
+            if (res == 'Registroupdate') {
+              $.notify("Usuario Desactivado Correctamente", "success");
+              hide_loading(); 
+              hide_modal_insert();  
+              v_admin_usuarios();                                                                
+            }
+            if (res == 'Error') {
+              $.notify("Hubo un error en el proceso", "error");
+              hide_loading();   
+            }             
+        },
+        error: function(e) {
+           console.error(e);
+           $.notify("Hubo un error en la petición del proceso", "error");
+           hide_loading();
+        }
+    }); 
+}
+
+</script>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">Administrar Clientes <span class="fa fa-users" style="color:#D31606;"></span></h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+                <div class="tab-content">
+                  <div class="tab-pane active" id="tab_1">
+                    <div id="bloque" class="col-sm-12 col-md-12">
+                      <div class="panel panel-default">
+
+                      <!--    
+                      <small><a href="#" class="fa fa-plus-circle" title="Añadir Cliente" style="color:green;font-size:35px;" data-toggle="modal" data-target="#modal_insert_usuario" onclick="select_rol()"></a>
+                      </small>
+                      -->
+                        <table class="table table-striped table-bordered table-hover" id="dataTables-usuarios">
+                              <thead>
+                                <tr style="font-size: 10px;">
+                                  <th>Op</th>
+                                  <th>Usuario</th>
+                                  <th>Nombres</th>
+                                  <th>Apellidos</th>
+                                  <th>Cedula</th>
+                                  <th>Fecha Nacimiento</th>  
+                                  <th style="display:none;">Telefono</th>                                   
+                                  <th>Dirección</th>                                  
+                                  <th>Descripción</th>
+                                  <th>Ciudad</th>
+                                  <th>Estado</th>                                                          
+                              </tr>
+                              </thead>
+                              <tbody> 
+                                {% for row in data['data_usuarios'] %}
+                                <tr style="font-size: 10px;">
+                                  <td>
+                                  <a style="color:orange;font-size:13px;" href="/{{row.0}}" class="fa fa-edit" title="Actualizar" data-toggle="modal" data-target="#modal_modificar_cliente" onclick="modal_modificarusuario('{{row[0]}}','{{row[1]}}','{{row[2]}}','{{row[3]}}','{{row[4]}}','{{row[5]}}','{{row[6]}}','{{row[7]}}','{{row[8]}}','{{row[9]}}','{{row[10]}}')"></a>
+                                  
+                                  <a style="color:red;font-size:13px;" href="/{{ row.0 }}" class="fa fa-times" title="Eliminar" data-toggle="modal" data-target="#modal_desactivarcliente" onclick="modal_eliminarusuario('{{row[0]}}','{{row[1]}}')"></a>	
+                                  </td>
+                                  <td>{{row[1]}}</td>
+                                  <td>{{row[2]}}</td>
+                                  <td>{{row[3]}}</td>
+                                  <td>{{row[4]}}</td>
+                                  <td>{{row[5]}}</td>
+                                  <td style="display:none;">{{row[6]}}</td>
+                                  <td>{{row[7]}}</td>
+                                  <td>{{row[8]}}</td>
+                                  <td>{{row[9]}}</td>
+                                  <td>{{row[10]}}
+                                    {% if row[10] == "activo" %}
+                                      <span class="fa fa-toggle-on" style="color:green;font-size:13px;"></span>
+                                    {% endif %}  
+                                    {% if row[10] == "inactivo" %}
+                                      <span class="fa fa-toggle-off" style="color:red;font-size:13px;"></span>
+                                    {% endif %} 
+                                  </td>
+                                </tr>
+                                {% endfor %}  
+                              </tbody>
+                        </table>              
+                      </div>      
+                    </div>
+                  </div>
+                </div>
+          </div>
+          <!-- /.col -->
+        </div>
+    </div>
+</section> 
+
+<!-- modal Eliminar -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_desactivarcliente">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Eliminar Cliente</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>      
+      <form class="form-horizontal">
+      <div class="box-body">
+        <div class="col-lg-12 col-md-12">
+          <div class="form-group"> 
+            <h3>Desea Eliminar este Usuario?</h3>               
+            <p style="display:none;" id="id_usuario"></p>
+              <h5>Usuario: <small id="usuario"></small></h5>
+          </div>
+        </div>
+      </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" onclick="eliminarusuario()">Aceptar</button>
+      <button type="button" class="btn btn-warning" data-dismiss="modal">Cerrar</button>
+    </div>
+
+    </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- modal Actualizar -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_modificar_cliente">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modificar Usuario</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+       <div id="contenidofromactualizarcliente"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#dataTables-usuarios').DataTable({
+        responsive: true
+        });
+    });
+
+</script>

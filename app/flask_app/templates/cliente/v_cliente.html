@@ -1,0 +1,286 @@
+<script type="text/javascript">
+  $(document).ready(function() {
+      tablafiltrocliente();  
+      select_ciudad();  
+      select_categoria();     
+  });
+
+   function tablafiltrocliente(){      
+    $.ajax({
+          url: '/tablafiltro_cliente',
+          type: "POST",
+          beforeSend: show_loading(),
+          dataType: 'html',
+          headers: {
+                  'Access-Control-Allow-Origin': '*'
+              },
+          success: function(res){
+              $('div#tablafiltrocliente').html(res);
+          //overlayclickclose_tran();
+          hide_loading(); 
+          }, 
+          error: function(e) {
+          console.error(e);
+          $.notify("Error al cargar los datos","warn"); 
+      }
+    }); 
+  }
+
+   function select_ciudad(){      
+    $.ajax({
+          url: '/listarselectciudad',
+          type: "POST",
+          beforeSend: show_loading(),
+          dataType: 'html',
+          headers: {
+                  'Access-Control-Allow-Origin': '*'
+              },
+          success: function(res){
+              $('select#select_ciudad').html(res);
+          //overlayclickclose_tran();
+          hide_loading(); 
+          }, 
+          error: function(e) {
+          console.error(e);
+          $.notify("Error al cargar los datos","warn"); 
+      }
+    }); 
+  }
+
+  function select_categoria(){      
+    $.ajax({
+          url: '/listarselectcategoriafiltro',
+          type: "POST",
+          beforeSend: show_loading(),
+          dataType: 'html',
+          headers: {
+                  'Access-Control-Allow-Origin': '*'
+              },
+          success: function(res){
+              $('select#select_categoria').html(res);
+          //overlayclickclose_tran();
+          hide_loading(); 
+          }, 
+          error: function(e) {
+          console.error(e);
+          $.notify("Error al cargar los datos","warn"); 
+      }
+    }); 
+  }  
+
+  function filtro_cliente(param) {
+    var param                 = param
+    var select_ciudad         = $('select#select_ciudad').val();  
+    var select_categoria      = $('select#select_categoria').val();  
+    var select_calificacion   = $('select#select_calificacion').val();  
+    
+    /*
+    var texrangoprecioini     = $('input#texrangoprecioini').val();  
+    var texrangopreciofin     = $('input#texrangopreciofin').val();  
+
+    if (texrangoprecioini > texrangopreciofin) {
+      $.notify("El campo Precio desde no debe ser mayor al precio hasta", "warn"); 
+      return;
+    }
+    */
+    
+    console.log("param " + param)
+    console.log("Ciudad " + select_ciudad)
+    console.log("Categoria " + select_categoria)
+    console.log("Calificacion " + select_calificacion)
+
+    $.ajax({
+            url: '/filtro_cliente',
+            type: "post",
+            data: {'param':param,'select_ciudad':select_ciudad,'select_categoria':select_categoria,'select_calificacion':select_calificacion},
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#tablafiltrocliente').html(res); 
+            hide_loading();                
+            }
+        });
+  }
+
+function modal_verportafolios(id) {    
+    $.ajax({
+            url: '/portafolios_proveedor',
+            type: "post",
+            data: {'id':id},
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido_portafolio').html(res); 
+            hide_loading();                
+            }
+        });        
+  }
+
+
+</script>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">Sitio del Cliente <span class="fa fa-cubes" style="color:#D31606;"></span></h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card-footer">
+  <div class="row">
+    <div class="col-sm-3 col-6">
+      <div class="description-block border-right">
+        <h5 class="description-percentage text-success">{{data['data_resum_prod']}}</h5>
+        <span class="description-text">PRODUCTOS REGISTRADOS</span>
+      </div>
+      <!-- /.description-block -->
+    </div>
+    <!-- /.col -->
+    <div class="col-sm-3 col-6">
+      <div class="description-block border-right">
+        <h5 class="description-percentage text-warning">{{data['data_resum_port']}}</h5>
+        <span class="description-text">PORTAFOLIOS REGISTRADOS</span>
+      </div>
+      <!-- /.description-block -->
+    </div>
+    <!-- /.col -->
+    <div class="col-sm-3 col-6">
+      <div class="description-block border-right">
+        <h5 class="description-percentage text-success">{{data['data_resum_cate']}}</h5>
+        <span class="description-text">CATEGORIAS REGISTRADAS</span>
+      </div>
+      <!-- /.description-block -->
+    </div>
+    <!-- /.col -->
+    <div class="col-sm-3 col-6">
+      <div class="description-block">
+        <h5 class="description-percentage text-danger">{{data['data_resum_usua']}}</h5>
+        <span class="description-text">PROVEEDORES REGISTRADOS</span>
+      </div>
+      <!-- /.description-block -->
+    </div>
+  </div>
+  <!-- /.row -->
+</div>
+
+
+<br/>
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+
+      <div class="col-lg-9 col-12">
+        <section class="content">
+		    <div class="container-fluid">
+		        <div class="row">
+		          <div class="col-12">
+		                <div class="tab-content">
+		                  <div class="tab-pane active" id="tab_1">
+		                    <div id="bloque" class="col-sm-12 col-md-12">
+		                      <div class="panel panel-default">		                          
+		                      	<div class="panel-heading">Encuentra tu proveedor  
+		                        </div> 
+		                        <div id="tablafiltrocliente"></div>              
+		                      </div>      
+		                    </div>
+		                  </div>
+		                </div>
+		          </div>
+		          <!-- /.col -->
+		        </div>
+		    </div>
+		</section>
+      </div>
+
+      <div class="col-lg-3 col-12">
+        <div class="small-box bg">
+          <div class="inner">
+            <h3></h3>
+            <p>Filtro Proveedores</p>
+          </div>
+
+          <div class="table-responsive" style="padding: 10px;">
+            <!-- checkbox
+            <div class="custom-control custom-checkbox mb-3">
+                <input id="cate1" type="checkbox" class="custom-control-input">
+                <label for="cate1" class="custom-control-label">Categoria 1</label>
+            </div>
+            -->            
+            <div class="form-group">
+                <div class="input-group-prepend">
+                    <select name="rol" class="custom-select mr-sm-2" id="select_ciudad" onchange="filtro_cliente('Ciudad')">
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group-prepend">
+                    <select name="rol" class="custom-select mr-sm-2" id="select_categoria" onchange="filtro_cliente('Categoria')">
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group-prepend">
+                    <select required="" name="rol" class="custom-select mr-sm-2" id="select_calificacion" onchange="filtro_cliente('Calificacion')">
+                        <option> -- Todas Las Calificaciones -- </option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+            </div>
+          <!--  
+            <p>Rango de precio</p>
+            <div class="form-group">
+                <div class="input-group-prepend">
+                    <input id="texrangoprecioini" type="text" class="form-control" placeholder="Precio desde">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-group-prepend">
+                    <input id="texrangopreciofin" type="text" class="form-control" placeholder="Precio hasta" onchange="filtro_cliente('Precio)">
+                </div>
+            </div>
+          -->
+        </div>
+
+        </div>
+      </div>
+      
+
+    </div>
+  </div>
+</section>
+
+<!-- modal Portafolios -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_carrito">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Portafolios</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+        <form class="form-horizontal">
+          <div class="card-body" >  
+            <div id="contenido_portafolio"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-warning btn-lg shiny" data-dismiss="modal" aria-hidden="true" style="display:none;">Cancel</button>
+          </div>
+
+        </form>
+
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,5 @@
+1. crear entorno:conda create -n whodo python=3.6
+2. ver entornos: conda info --envs
+3. Ir a gestorcatalo: conda activate whodo 
+4. ir a directorio
+5. pip install  -r requirements.txt

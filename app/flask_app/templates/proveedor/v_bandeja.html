@@ -1,0 +1,388 @@
+<script type="text/javascript">
+
+function actualizar_bandeja(idproceso,proceso,descproceso,estado) {
+    	var id_bandeja 	= $('p#id_bandeja').text(); 
+    	var estado_     = $('small#estado').text(); 
+    	var estado      = $('select#select_estado').val(); 
+    	var activo_	    = $('small#activo').text();
+    	var activo      = $('select#select_activo').val(); 
+      var calificacion= $('select#select_calificacion').val(); 
+
+    	if (estado == "0") {
+    		var _estado = estado_
+    	} else {
+    		var _estado = estado
+    	}
+
+    	if (activo == "none") {
+    		var _activo = activo_
+    	} else {
+    		var _activo = activo
+    	}
+
+      if (calificacion == '-- Seleccione Calificación --') {
+        $.notify("El campo calificación es obligatorio", "warn");
+        return;
+      }
+
+        $.ajax({
+            url: '/c_actualizar_bandeja',
+            type: "post",
+            data: {'id_bandeja':id_bandeja,'_estado':_estado,'_activo':_activo,'calificacion':calificacion},
+            beforeSend: show_loading(),
+            dataType: "text",
+            success: function(res){
+                if (res == 'RegistroActualizado') {
+                	$.notify("Registro Actualizado Correctamente", "success");
+                	hide_loading();  
+                	hide_modal_insert();
+                	v_bandeja(); 
+                }
+                if (res == 'Error') {
+               		$.notify("Hubo un error en el proceso", "error");
+               		hide_loading(); 	
+                }             
+            },
+            error: function(e) {
+               console.error(e);
+               $.notify("Hubo un error en la petición del proceso", "error");
+               hide_loading();
+            }
+        });
+    }	
+	
+function modal_verproductosbandejaproveedor(id) {    
+    $.ajax({
+            url: '/c_modal_verproductosbandejaproveedor',
+            type: "post",
+            data: {'id':id},
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido_detallepedido').html(res); 
+            hide_loading();                
+            }
+        });        
+  }
+
+function modal_editarbandeja(id_bandeja,estado,activo) {
+  $('p#id_bandeja').html(id_bandeja);
+  $('small#estado').html(estado); 
+  $('small#activo').html(activo); 
+}
+
+
+</script>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <!--<h1 class="m-0 text-dark">Carrito <span class="fa fa-cart-plus" style="color:#D31606;"></span></h1>-->
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <!-- Small boxes (Stat box) -->
+     <div class="row">
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box">
+          <span class="info-box-icon"><i class="fa fa-circle" style="color:yellow;"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">Solicitudes Pendientes</span>{{data['data_solic_pendientes']}}
+            <span class="info-box-number">
+            </span>
+          </div>
+          <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+      </div>
+      <!-- /.col -->
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box mb-3">
+          <span class="info-box-icon"><i class="fa fa-circle" style="color:green;"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">Solicitudes Gestionadas</span>{{data['data_solic_gestionadas']}}
+          </div>
+          <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+      </div>
+      <!-- /.col -->
+
+      <!-- fix for small devices only -->
+      <div class="clearfix hidden-md-up"></div>
+
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box mb-3">
+          <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-shopping-cart"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">Pedidos Pendientes</span>{{data['data_pedidos_pendientes']}}
+          </div>
+          <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+      </div>
+      <!-- /.col -->
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box mb-3">
+          <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">Pedidos Gestionados</span>{{data['data_pedidos_gestionados']}}
+          </div>
+          <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+      </div>
+      <!-- /.col -->
+    </div>
+    <!-- /.row -->
+  </div><!-- /.container-fluid -->
+</section>
+
+<section class="content">
+<div class="row">
+		<div class="col-md-12">
+		  <div class="card card-primary card-outline">
+		    <div class="card-header">
+		      <h3 class="card-title">Bandeja</h3>
+
+	
+		      <!-- /.card-tools -->
+		    </div>
+		    <!-- /.card-header -->
+		    <div class="card-body p-0">
+		      <div class="table-responsive mailbox-messages">
+
+		      	<!--
+		        <table class="table table-hover table-striped" id="table_bandeja">
+		          <tbody>
+		          <tr>
+		            <td>
+		              <div class="icheck-primary">
+		                <input type="checkbox" value="" id="check1">
+		                <label for="check1"></label>
+		              </div>
+		            </td>
+		            <td class="mailbox-star"><a href="#"><i class="fas fa-star text-warning"></i></a></td>
+		            <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
+		            <td class="mailbox-subject"><b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
+		            </td>
+		            <td class="mailbox-attachment"></td>
+		            <td class="mailbox-date">5 mins ago</td>
+		          </tr>
+		          <tr>
+		            <td>
+		              <div class="icheck-primary">
+		                <input type="checkbox" value="" id="check2">
+		                <label for="check2"></label>
+		              </div>
+		            </td>
+		            <td class="mailbox-star"><a href="#"><i class="fas fa-star-o text-warning"></i></a></td>
+		            <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
+		            <td class="mailbox-subject"><b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
+		            </td>
+		            <td class="mailbox-attachment"><i class="fas fa-paperclip"></i></td>
+		            <td class="mailbox-date">28 mins ago</td>
+		          </tr>
+		          <tr>
+		            <td>
+		              <div class="icheck-primary">
+		                <input type="checkbox" value="" id="check3">
+		                <label for="check3"></label>
+		              </div>
+		            </td>
+		            <td class="mailbox-star"><a href="#"><i class="fas fa-star-o text-warning"></i></a></td>
+		            <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
+		            <td class="mailbox-subject"><b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
+		            </td>
+		            <td class="mailbox-attachment"><i class="fas fa-paperclip"></i></td>
+		            <td class="mailbox-date">11 hours ago</td>
+		          </tr>
+
+		          </tbody>
+		        </table>
+		        -->
+
+		        <div class="row">
+	                <div class="table-responsive" style="padding: 10px;">
+		                <div class="tab-content">
+			                <div class="tab-pane active" id="tab_1">
+				                <div id="bloque" class="col-sm-12 col-md-12">
+					                <div class="panel panel-default">    	
+
+							        <table class="table table-striped table-bordered table-hover" id="dataTables-bandeja">
+								      <thead>
+								        <tr style="font-size: 10px;">
+                          {% if data['param'] == "proveedor" %}
+                          <th>Op</th>
+                          {% endif %} 
+								          <th>Tipo</th>
+								          <th>Detalle Solicitud</th>  
+								          <th>Estado</th>  
+								          <th>Activo</th>                                                     
+								      </tr>
+								      </thead>
+								      <tbody> 
+								        {% for row in data['data_bandeja_proveedor'] %}
+								        <tr style="font-size: 10px;">
+								          {% if data['param'] == "proveedor" %}  
+                          <td>                          
+								          <a type="submit" style="color:green;font-size:13px;" href="{{row.0}}" class="fa fa-eye" title="Ver Solicitud" data-toggle="modal" data-target="#modal_detalle_pedido" onclick="modal_verproductosbandejaproveedor('{{row[0]}}')"></a>  
+								          <a type="submit" style="color:orange;font-size:13px;" href="{{row.0}}" class="fa fa-edit" title="Editar" data-toggle="modal" data-target="#modal_editarbandeja" onclick="modal_editarbandeja('{{row[0]}}','{{row[3]}}','{{row[4]}}')"></a>     
+								          </td>
+                          {% endif %} 
+								          <td>
+								          {% if row[1] == 'Pedido' %}	
+								          	<i class="fas fa-star text-warning"></i>
+								          {% endif %}
+								          	{{row[1]}} 	
+								          </td>
+								          <td>{{row[2]}}</td>
+								          <td>
+								          {% if row[3] == '1' %}
+									          <i class="fa fa-circle" style="color:yellow;font-size:15px;"></i>
+									      {% endif %} 
+									      {% if row[3] == '2' %}
+									          <i class="fa fa-circle" style="color:green;;font-size:15px;"></i>
+									      {% endif %}   
+								      	  </td>
+								          <td>
+									        {% if row[4] == 'Y' %}
+									          <span class="fa fa-toggle-on" style="color:green;font-size:13px;"></span>
+									        {% endif %}  
+									        {% if row[4] == 'N' %}
+									          <span class="fa fa-toggle-off" style="color:red;font-size:13px;"></span>
+									        {% endif %}  									       
+									      </td>
+								        </tr>
+								        {% endfor %}  
+								      </tbody>
+								    </table>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+		      </div>
+		      <!-- /.mail-box-messages -->
+		    </div>
+		  </div>
+		  <!-- /.card -->
+		</div>
+	</div>
+</section>     
+
+
+<!-- modal bandeja pedido -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_detalle_pedido">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalle Pedido</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+        <form class="form-horizontal">
+          <div class="card-body" >  
+            <div id="contenido_detallepedido"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-warning btn-lg shiny" data-dismiss="modal" aria-hidden="true" style="display:none;">Cancel</button>
+          </div>
+
+        </form>
+    </div>
+  </div>
+</div>   
+
+
+<!-- modal editar bandeja -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_editarbandeja">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>      
+      <form class="form-horizontal">
+      <div class="box-body">
+        <div class="col-lg-12 col-md-12">
+          <div class="form-group">                
+            <div class="input-group">
+              <p id="id_bandeja" style="display:none;"></p>
+              <small id="estado" style="display:none;"></small>
+              <small id="activo" style="display:none;"></small>
+
+
+                <div class="card-body"> 
+		          <div class="col-lg-12 col-md-12">
+		              <div class="input-group-prepend">
+		                <select id="select_activo" class="form-control">
+		                    <option value="none"><font style="vertical-align: inherit;">-- Seleccione Tipo --</font></option>
+		                    <option value="Y"><font style="vertical-align: inherit;">Activo</font></option>
+		                    <option value="N"><font style="vertical-align: inherit;">Inactivo</font></option>
+		                </select>
+		              </div>
+                  <br/>
+                  <div class="input-group-prepend">
+                    <select id="select_estado" class="form-control">
+                        <option value="0"><font style="vertical-align: inherit;">-- Seleccione Estado --</font></option>
+                        <option value="1"><font style="vertical-align: inherit;">Recibido</font></option>
+                        <option value="2"><font style="vertical-align: inherit;">Gestionado</font></option>
+                    </select>
+                  </div>
+                  <br/>
+                  <div class="input-group-prepend">
+                    <select id="select_calificacion" class="form-control">
+                        <option><font style="vertical-align: inherit;">-- Seleccione Calificación --</font></option>
+                        <option><font style="vertical-align: inherit;">1</font></option>
+                        <option><font style="vertical-align: inherit;">2</font></option>
+                        <option><font style="vertical-align: inherit;">3</font></option>
+                        <option><font style="vertical-align: inherit;">4</font></option>
+                        <option><font style="vertical-align: inherit;">5</font></option>
+                    </select>
+                  </div>
+		          </div>
+		        </div>
+
+            </div>   
+          </div>
+        </div>
+      </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" onclick="actualizar_bandeja()">Actualizar</button>
+      <button type="button" class="btn btn-warning" data-dismiss="modal">Cerrar</button>
+    </div>
+
+    </form>
+
+    </div>
+  </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#dataTables-bandeja').DataTable({
+        responsive: true
+        });
+    });
+</script>
+

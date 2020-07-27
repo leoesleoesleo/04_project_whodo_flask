@@ -1,0 +1,724 @@
+<script type="text/javascript">
+  
+  $(document).ready(function() {
+      select_categoria(); 
+      select_portafolio();      
+  });
+
+  function mostrarArchivo(){
+    var archivo=$('input#inputArchivoCargaVentasHide').val();
+    $('input#inputArchivoCargaVentas').val(archivo);
+  }
+
+  function cargarArchivoVentasSalida(){ 
+    var archivo=$('input#inputArchivoCargaVentas').val();        
+    var extensionArchivo= archivo.substring(archivo.lastIndexOf('.') + 1);   
+
+    var portafolio      = $('select#select_portafolio').val();  
+
+    $("select#select_portafolio").removeAttr("style");
+    $("input#inputArchivoCargaVentas").removeAttr("style");
+
+    if (portafolio == '' || portafolio == '-- Seleccione Portafolio --' ) {
+      $.notify("El campo Portafolio no puede estar vacio", "warn");
+      $("select#select_portafolio").css({'border-color':'red'});
+      return;
+    }  
+    if (archivo==''){
+      $.notify("Debe seleccionar un archivo", "error");
+      $("input#inputArchivoCargaVentas").css({'border-color':'red'});
+      return;
+    }
+    if (extensionArchivo!='xls' && extensionArchivo!='xlsx'){
+        $.notify("Seleccione un archivo formato: .xls/.xlsx", "error");
+        $("input#inputArchivoCargaVentas").css({'border-color':'red'});
+        return;
+    } 
+    $.ajaxFileUpload({
+        url: '/upload',
+        secureuri: false,
+        fileElementId:'inputArchivoCargaVentasHide',
+        data: {'portafolio':portafolio},
+        type: "POST",        
+        dataType: 'text',        
+        beforeSend: show_loading(),
+        //complete: function(objeto){dialogoEsperaOcultar();},
+        success: function(res) {                   
+          if (res == 'insert') {
+              $.notify("Productos Cargados Correctamente", "success"); 
+              hide_loading(); 
+              v_proveedor('none');                                                                  
+            } 
+          if (res == 'nodata') {
+                $.notify("Debe seleccionar un fichero", "error");
+                hide_loading();   
+            }
+          if (res == 'noextension') {
+                $.notify("Seleccione un archivo formato: .xls/.xlsx", "error");
+                hide_loading();   
+              }
+          if (res == 'noformato') {
+                $.notify("Se debe utilizar la plantilla ejemplo para poder subir productos", "error");
+                hide_loading();   
+              }    
+          if (res == 'Error') {
+                $.notify("Hubo un error en el proceso", "error");
+                hide_loading();   
+              }                 
+        },
+        error: function(e) {
+           console.error(e);
+           $.notify("Hubo un error en la petición del proceso", "error");
+           hide_loading();
+          }
+    });
+
+  }
+    
+  function modal_eliminarproducto(id_producto,portafolio,nombre,precio) {
+      $('p#id_producto').html(id_producto);
+      $('small#portafolio').html(portafolio); 
+      $('small#nombre').html(nombre); 
+      $('small#precio').html(precio); 
+  }
+
+  function eliminarproducto() {
+    var id_producto      = $('p#id_producto').text();
+      $.ajax({
+          url: '/c_eliminarproducto',
+          type: "POST",
+          data: {'id_producto':id_producto},
+          beforeSend: show_loading(),
+          dataType: "text",
+          success: function(res){
+              if (res == 'RegistroDelete') {
+                $.notify("Producto Eliminado Correctamente", "success"); 
+                hide_loading(); 
+                hide_modal_insert();  
+                v_proveedor('none');                                                                  
+              }
+              if (res == 'Error') {
+                $.notify("Hubo un error en el proceso", "error");
+                hide_loading();   
+              }             
+          },
+          error: function(e) {
+             console.error(e);
+             $.notify("Hubo un error en la petición del proceso", "error");
+             hide_loading();
+          }
+      });    
+
+}
+
+  function modal_eliminarportafolio(id_portafolio,portafolio,categoria) {
+      $('p#id_portafolio').html(id_portafolio);
+      $('small#portafolio_').html(portafolio); 
+      $('small#categoria').html(categoria); 
+  }
+
+  function eliminarportafolio() {
+    var id_portafolio      = $('p#id_portafolio').text();
+      $.ajax({
+          url: '/c_eliminarportafolio',
+          type: "POST",
+          data: {'id_portafolio':id_portafolio},
+          beforeSend: show_loading(),
+          dataType: "text",
+          success: function(res){
+              if (res == 'RegistroDelete') {
+                $.notify("Portafolio Eliminado Correctamente", "success");
+                hide_loading(); 
+                hide_modal_insert();  
+                v_proveedor('portafolios');                                                                  
+              }
+              if (res == 'existeproductos') {
+                $.notify("Garantice que este portafolio no tenga productos para poder eliminarlo", "error");
+                hide_loading();   
+              } 
+              if (res == 'Error') {
+                $.notify("Hubo un error en el proceso", "error");
+                hide_loading();   
+              }             
+          },
+          error: function(e) {
+             console.error(e);
+             $.notify("Hubo un error en la petición del proceso", "error");
+             hide_loading();
+          }
+      });    
+
+}
+  
+  function sugerir_categoria() {
+    var sugerir_categoria      = $('input#sugerir_categoria').val();   
+
+    $("input#sugerir_categoria").removeAttr("style");
+
+    if (sugerir_categoria == '') {
+      $.notify("El campo Sugerir Categoria no puede estar vacio", "warn");
+      $("input#sugerir_categoria").css({'border-color':'red'});
+      return;
+    }
+
+      $.ajax({
+          url: '/sugerir_categoria',
+          type: "POST",
+          data: {'sugerir_categoria':sugerir_categoria},
+          beforeSend: show_loading(),
+          dataType: "text",
+          success: function(res){
+              if (res == 'RegistroInsert') {
+                $.notify("Categoria creada correctamente", "success");
+                hide_loading();                                                                    
+              }
+              if (res == 'duplicado') {
+                $.notify("Esta Categoria ya se encuentra registrada", "error");
+                hide_loading(); 
+              }
+              if (res == 'Error') {
+                $.notify("Hubo un error en el proceso", "error");
+                hide_loading();   
+              }             
+          },
+          error: function(e) {
+             console.error(e);
+             $.notify("Hubo un error en la petición del proceso", "error");
+             hide_loading();
+          }
+      });    
+
+}
+
+  function agregarportafolio() {
+    var nom_portafolio      = $('input#nom_portafolio').val();   
+    var select_categoria    = $('select#select_categoria').val();  
+
+    $("input#nom_portafolio").removeAttr("style");
+    $("select#select_categoria").removeAttr("style");
+
+    if (select_categoria == '' || select_categoria == '-- Categorias --' ) {
+      $.notify("Debe elegir una opción en ell campo Categoria ", "warn");
+      $("select#select_categoria").css({'border-color':'red'});
+      return;
+    }
+    if (nom_portafolio == '') {
+      $.notify("El campo Portafolio no puede estar vacio", "warn");
+      $("input#nom_portafolio").css({'border-color':'red'});
+      return;
+    }
+
+      $.ajax({
+          url: '/agregarportafolio',
+          type: "POST",
+          data: {'nom_portafolio':nom_portafolio,'select_categoria':select_categoria},
+          beforeSend: show_loading(),
+          dataType: "text",
+          success: function(res){
+              if (res == 'RegistroInsert') {
+                $.notify("Portafolio creado correctamente", "success");
+                hide_loading();                                    
+                v_proveedor('portafolios');                                   
+              }
+              if (res == 'portafolioDuplicado') {
+                $.notify("Este Portafolio ya se encuentra registrado", "error");
+                hide_loading(); 
+              }
+              if (res == 'Error') {
+                $.notify("Hubo un error en el proceso", "error");
+                hide_loading();   
+              }             
+          },
+          error: function(e) {
+             console.error(e);
+             $.notify("Hubo un error en la petición del proceso", "error");
+             hide_loading();
+          }
+      });    
+
+}
+
+  function select_portafolio(){      
+    $.ajax({
+          url: '/listarselectportafolio',
+          type: "POST",
+          beforeSend: show_loading(),
+          dataType: 'html',
+          headers: {
+                  'Access-Control-Allow-Origin': '*'
+              },
+          success: function(res){
+              $('select#select_portafolio').html(res);
+          //overlayclickclose_tran();
+          hide_loading(); 
+          }, 
+          error: function(e) {
+          console.error(e);
+          $.notify("Error al cargar los datos","warn"); 
+      }
+    }); 
+  } 
+    
+ function select_categoria(){      
+    $.ajax({
+          url: '/listarselectcategoria',
+          type: "POST",
+          beforeSend: show_loading(),
+          dataType: 'html',
+          headers: {
+                  'Access-Control-Allow-Origin': '*'
+              },
+          success: function(res){
+              $('select#select_categoria').html(res);
+          //overlayclickclose_tran();
+          hide_loading(); 
+          }, 
+          error: function(e) {
+          console.error(e);
+          $.notify("Error al cargar los datos","warn"); 
+      }
+    }); 
+  }   
+
+</script>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">Sitio del Proveedor <span class="fa fa-industry" style="color:#D31606;"></span></h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card-footer">
+  <div class="row">
+    <div class="col-sm-3 col-6">
+      <div class="description-block border-right">
+        <h5 class="description-percentage text-success">{{data['data_resum_prod']}}</h5>
+        <span class="description-text">MIS PRODUCTOS REGISTRADOS</span>
+      </div>
+      <!-- /.description-block -->
+    </div>
+    <!-- /.col -->
+    <div class="col-sm-3 col-6">
+      <div class="description-block border-right">
+        <h5 class="description-percentage text-warning">{{data['data_resum_port']}}</h5>
+        <span class="description-text">MIS PORTAFOLIOS REGISTRADOS</span>
+      </div>
+      <!-- /.description-block -->
+    </div>
+    <!-- /.col -->
+    <div class="col-sm-3 col-6">
+      <div class="description-block border-right">
+        <h5 class="description-percentage text-success">{{data['data_resum_cate']}}</h5>
+        <span class="description-text">CATEGORIAS REGISTRADAS</span>
+      </div>
+      <!-- /.description-block -->
+    </div>
+    <!-- /.col -->
+    <div class="col-sm-3 col-6">
+      <div class="description-block">
+        <h5 class="description-percentage text-danger">{{data['data_resum_usua']}}</h5>
+        <span class="description-text">CLIENTES REGISTRADOS</span>
+      </div>
+      <!-- /.description-block -->
+    </div>
+  </div>
+  <!-- /.row -->
+</div>
+<br/>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+                <div class="tab-content">
+                    <div id="bloque" class="col-sm-12 col-md-12">
+                      <div class="panel panel-default">
+                        <div class="inner">
+                          <h4>
+                            Mi Perfil <span class="fa fa-user" style="color:blue;"></span>
+                          </h4>
+                        </div>                          
+                        <br>
+
+                        <table class="table table-striped table-bordered table-hover" id="dataTables-proveedores">
+                              <thead>
+                                <tr style="font-size: 10px;">
+                                  <th>Op</th>
+                                  <th>Usuario</th>
+                                  <th>Empresa</th>
+                                  <th>Nit</th>
+                                  <th>Telefono</th>                                   
+                                  <th>Dirección</th>                                  
+                                  <th>Descripción</th>
+                                  <th>Ciudad</th>
+                                  <th>Estado</th>                                                          
+                              </tr>
+                              </thead>
+                              <tbody> 
+                                {% for row in data['data_proveedor'] %}
+                                <tr style="font-size: 10px;">
+                                  <td>
+                                    <!--
+                                    <a style="color:orange;font-size:13px;" href="/update/{{row.0}}" class="fa fa-edit" title="Actualizar" data-toggle="modal" data-target="#modal_update" onclick="modal_update_usuario('{{row[0]}}','{{row[1]}}','{{row[2]}}','{{row[3]}}','{{row[4]}}','{{row[5]}}','{{row[6]}}','{{row[7]}}','{{row[8]}}')"></a>
+                                    <a style="color:red;font-size:13px;" href="/delete/{{ row.0 }}" class="fa fa-times" title="Eliminar" data-toggle="modal" data-target="#modal_delete" onclick="modal_delete_usuario('{{row[0]}}','{{row[1]}}','{{row[3]}}','{{row[4]}}')"></a>
+                                  -->
+                                  <a style="color:orange;font-size:13px;" href="/update/{{row.0}}" class="fa fa-edit" title="Actualizar" data-toggle="modal" data-target="#modal_update"></a>
+                                  
+                                  <a style="color:red;font-size:13px;" href="/delete/{{ row.0 }}" class="fa fa-times" title="Eliminar" data-toggle="modal" data-target="#modal_delete"></a> 
+                                  </td>
+                                  <td>{{row[1]}}</td>
+                                  <td>{{row[2]}}</td>
+                                  <td>{{row[3]}}</td>
+                                  <td>{{row[4]}}</td>
+                                  <td>{{row[5]}}</td>
+                                  <td>{{row[6]}}</td>
+                                  <td>{{row[7]}}</td>
+                                  <td>{{row[8]}}
+                                    {% if row[8] == "activo" %}
+                                      <span class="fa fa-toggle-on" style="color:green;font-size:13px;"></span>
+                                    {% endif %}  
+                                    {% if row[8] == "inactivo" %}
+                                      <span class="fa fa-toggle-off" style="color:red;font-size:13px;"></span>
+                                    {% endif %} 
+                                  </td>
+                                </tr>
+                                {% endfor %}  
+                              </tbody>
+                        </table>              
+                      </div>      
+                    </div>
+                </div>
+          </div>
+          <!-- /.col -->
+        </div>
+    </div>
+</section> 
+
+<br> 
+<br> 
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <!-- Custom Tabs -->
+            <div class="card">
+              <div class="card-header d-flex p-0">
+                <h3 class="card-title p-3">
+                  <small> 
+                    <div class="panel-heading">Configuraciones  
+                        <a href="#" class="fa fa-cog" style="color:blue;font-size:35px;"></a>
+                    </div>
+                  </small>
+                </h3>
+                <ul class="nav nav-pills ml-auto p-2">
+                  <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab" id="cargarproductos">Cargar Productos</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab" id="portafolios">Portafolios</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" id="categoria">Sugerir Categorias</a></li>
+                </ul>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+                <div class="tab-content">
+                  <div class="tab-pane active" id="tab_1">
+                    <div id="bloque" class="col-sm-12 col-md-12">
+                      <div class="panel panel-default">
+                        <section class="content">
+                          <div class="container-fluid">
+                            <div class="row">
+                              <div class="col-lg-4 col-12">                                   
+                                  <div class="panel panel-default">
+                                    <div class="row">
+                                      <div class="form-group">
+
+                                          <div class="col-lg-12 col-md-12">
+                                            <div class="form-group">                
+                                              <div class="input-group">
+                                                <select required="" name="rol" class="custom-select mr-sm-2" id="select_portafolio">
+                                                </select>
+                                              </div>   
+                                            </div>
+                                          </div>
+
+                                          <div class="col-lg-12 col-md-12">
+                                            <div class="form-group">                
+                                              <div class="input-group">            
+                                                <div class="input-group">
+                                                  <label class="input-group-btn">
+                                                    <span class="btn btn-primary">
+                                                        Examinar… <input style="display: none;" multiple="" type="file" onchange="mostrarArchivo()" id="inputArchivoCargaVentasHide" name="inputArchivoCargaVentasHide">
+                                                    </span>
+                                                  </label>
+                                                  <input class="form-control" readonly="" type="text" size="50" id="inputArchivoCargaVentas">              
+                                                </div>                                                    
+                                              </div>  
+
+                                              <!--  
+                                              <a style="margin:15px;"><i class="fa fa-file-excel-o"></i>&nbsp;Descargar Formato</a>   
+                                              -->
+
+                                            </div>
+                                          </div>
+
+                                          <button type="button" class="btn btn-sm btn-outline-primary" onclick="cargarArchivoVentasSalida()">Subir productos</button>
+                                          <br>                                       
+
+                                      </div>
+                                    </div>
+                                  </div>
+                              </div>
+
+                              <div class="col-lg-8 col-12">
+                                <section class="content">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                      <div class="col-12">
+                                            <div class="tab-content">
+                                              <div class="tab-pane active" id="tab_1">
+                                                <div id="bloque" class="col-sm-12 col-md-12">
+                                                  <div class="panel panel-default">                             
+                                                    <div class="panel-heading">Mis Productos 
+                                                    </div> 
+                                                    <table class="table table-striped table-bordered table-hover" id="dataTables-productos">
+                                                          <thead>
+                                                            <tr style="font-size: 10px;">
+                                                              <th>Op</th>
+                                                              <th>Portafolio</th>
+                                                              <th>Nombre</th>
+                                                              <th>Precio</th>
+                                                              <th>Detalle</th>
+                                                              <th>Descripcion</th>   
+                                                              <th>Estado</th>                                   
+                                                          </tr>
+                                                          </thead>
+                                                          <tbody> 
+                                                            {% for row in data['data_productos'] %}
+                                                            <tr style="font-size: 10px;">
+                                                              <td>    
+                                                              <button type="submit" style="color:red;font-size:13px;" href="/delete/{{ row.0 }}" class="fa fa-times" title="Eliminar" data-toggle="modal" data-target="#modal_eliminarproducto" onclick="modal_eliminarproducto('{{row[0]}}','{{row[1]}}','{{row[2]}}','{{row[3]}}')"></button> 
+                                                              </td>
+                                                              <td>{{row[1]}}</td>
+                                                              <td>{{row[2]}}</td>
+                                                              <td>{{row[3]}}</td>
+                                                              <td>{{row[4]}}</td>
+                                                              <td>{{row[5]}}</td>
+                                                              <td>{{row[6]}}
+                                                                {% if row[6] == "activo" %}
+                                                                  <span class="fa fa-toggle-on" style="color:green;font-size:13px;"></span>
+                                                                {% endif %}  
+                                                                {% if row[6] == "inactivo" %}
+                                                                  <span class="fa fa-toggle-off" style="color:red;font-size:13px;"></span>
+                                                                {% endif %} 
+                                                              </td>  
+                                                            </tr>
+                                                            {% endfor %}  
+                                                          </tbody>
+                                                    </table>              
+                                                  </div>      
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                                </section>
+                              </div>
+                            </div>
+                          </div>
+                        </section>
+
+
+                      </div>      
+                    </div>
+
+                  </div>
+
+                  <div class="tab-pane" id="tab_2">
+                    <div id="bloque" class="col-sm-12 col-md-12">
+                      <div class="panel panel-default">
+                        <section class="content">
+                          <div class="container-fluid">
+                            <div class="row">
+                              <div class="col-lg-8 col-12">
+                                <section class="content">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                      <div class="col-12">
+                                            <div class="tab-content">
+                                              <div class="tab-pane active" id="tab_1">
+                                                <div id="bloque" class="col-sm-12 col-md-12">
+                                                  <div class="panel panel-default">                             
+                                                    <div class="panel-heading">Mis Portafolios 
+                                                    </div> 
+                                                    <table class="table table-striped table-bordered table-hover" id="dataTables-portafolios">
+                                                          <thead>
+                                                            <tr style="font-size: 10px;">
+                                                              <th>Op</th>
+                                                              <th>Nombre</th>
+                                                              <th>Portafolio</th>
+                                                              <th>Categoria</th>                                                        
+                                                          </tr>
+                                                          </thead>
+                                                          <tbody> 
+                                                            {% for row in data['data_portafolio'] %}
+                                                            <tr style="font-size: 10px;">
+                                                              <td>
+                                                                <button type="submit" style="color:red;font-size:13px;" href="/delete/{{ row.0 }}" class="fa fa-times" title="Eliminar" data-toggle="modal" data-target="#modal_eliminarportafolio" onclick="modal_eliminarportafolio('{{row[0]}}','{{row[2]}}','{{row[3]}}')"></button> 
+                                                              </td>
+                                                              <td>{{row[1]}}</td>
+                                                              <td>{{row[2]}}</td>
+                                                              <td>{{row[3]}}</td>  
+                                                            </tr>
+                                                            {% endfor %}  
+                                                          </tbody>
+                                                    </table>              
+                                                  </div>      
+                                                </div>
+                                              </div>
+                                            </div>
+                                      </div>
+                                      <!-- /.col -->
+                                    </div>
+                                </div>
+                            </section>
+                              </div>
+
+                              <div class="col-lg-4 col-12">  
+                                  <p>Crear nuevo Portafolio</p>
+                                  <div class="table-responsive" style="padding: 10px;">
+                                    <div class="form-group">
+                                        <div class="input-group-prepend">
+                                            <select class="custom-select mr-sm-2" id="select_categoria">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="input-group-prepend">
+                                            <input id="nom_portafolio" type="text" class="form-control" placeholder="Nombre Portafolio">
+                                        </div>
+                                    </div>
+                                    <div class="">
+                                        <button class="btn btn-sm btn-outline-primary" type="submit" onclick="agregarportafolio()">Agregar
+                                       </button>
+                                    </div>
+                                </div>                              
+                              </div>
+                              
+                            </div>
+                          </div>
+                        </section>
+
+
+                      </div>      
+                    </div>
+                  </div>
+
+                  <div class="tab-pane" id="tab_3">
+                    <div id="bloque" class="col-sm-12 col-md-12">
+                      
+                      <div class="row">
+                          <div class="col-lg-6 col-md-12">
+                              <div class="form-group">
+                                <div class="input-group-prepend">
+                                  <input type="input" class="form-control" id="sugerir_categoria" placeholder="Categoria a sugerir" >
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary" type="submit" onclick="sugerir_categoria()">Sugerir Categoria</button>
+                          
+                    </div>
+                  </div>
+                  <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+              </div><!-- /.card-body -->
+            </div>
+            <!-- ./card -->
+          </div>
+          <!-- /.col -->
+        </div>
+    </div>
+</section>
+
+<!-- modal Eliminar producto -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_eliminarproducto">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Recuperar Contraseña</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>      
+      <form class="form-horizontal">
+      <div class="box-body">
+        <div class="col-lg-12 col-md-12">
+          <div class="form-group"> 
+            <h3>Desea eliminar este producto?</h3>               
+            <p id="id_producto"></p>
+              <h4>Portafolio: <small id="portafolio"></small></h4>
+              <h4>Producto: <small id="nombre"></small></h4>
+              <h4>Precio: <small id="precio"></small> </h4> 
+          </div>
+        </div>
+      </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" onclick="eliminarproducto()">Aceptar</button>
+      <button type="button" class="btn btn-warning" data-dismiss="modal">Cerrar</button>
+    </div>
+
+    </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- modal Eliminar portafolio -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_eliminarportafolio">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Eliminación de Portafolio</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>      
+      <form class="form-horizontal">
+      <div class="box-body">
+        <div class="col-lg-12 col-md-12">
+          <div class="form-group"> 
+            <h3>Desea eliminar este Portafolio?</h3>               
+            <p id="id_portafolio"></p>
+              <h4>Portafolio: <small id="portafolio_"></small></h4>
+              <h4>Categoria: <small id="categoria"></small></h4>
+          </div>
+        </div>
+      </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" onclick="eliminarportafolio()">Aceptar</button>
+      <button type="button" class="btn btn-warning" data-dismiss="modal">Cerrar</button>
+    </div>
+
+    </form>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        $('#dataTables-portafolios').DataTable({
+        responsive: true
+        });
+    });
+
+    $(document).ready(function() {
+        $('#dataTables-productos').DataTable({
+        responsive: true
+        });
+    })
+
+</script>

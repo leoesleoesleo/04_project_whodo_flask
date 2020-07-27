@@ -1,0 +1,159 @@
+<script type="text/javascript">
+
+$(document).ready(function() {
+    select_ciudad();      
+});
+
+function select_ciudad(){   
+    $.ajax({
+          url: '/listarselectciudad_logueo',
+          type: "POST",
+          beforeSend: show_loading(),
+          dataType: 'html',
+          headers: {
+                  'Access-Control-Allow-Origin': '*'
+              },
+          success: function(res){
+              $('select#ciudad').html(res);
+          hide_loading(); 
+          }, 
+          error: function(e) {
+          console.error(e);
+          $.notify("Error al cargar los datos","warn"); 
+      }
+    }); 
+}
+
+</script>
+
+<form class="form-horizontal">            
+  <div class="card-body" >
+
+        {% if data['activo'] == "activo" %}
+          <span class="fa fa-toggle-on" style="color:green;font-size:25px;float:right;"> {{data['activo']}}</span>
+        {% endif %}  
+        {% if data['activo'] == "inactivo" %}
+          <span class="fa fa-toggle-off" style="color:red;font-size:25px;float:right;"> {{data['activo']}}</span>
+        {% endif %} 
+
+      <small style="display:none;" id="id_usuario">{{data['id_usuario']}}</small>        
+        
+        <div class="row">
+        <div class="col-lg-12 col-md-12">
+          <div class="form-group">                
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="fa fa-toggle-off"></i></span>
+              </div>
+              <select class="custom-select mr-sm-2" id="estado">
+                  <option value="0">-- Seleccione Estado --</option>
+                  <option value="1">Activo</option>
+                  <option value="2">Inactivo</option>
+              </select>
+            </div>   
+          </div>
+        </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">                
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fa fa-industry"></i></span>
+                </div>
+                <input id="empresa" type="text" class="form-control" placeholder="{{data['empresa']}}">
+              </div>   
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">                
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fa fa-map"></i></span>
+                </div>
+                <input id="direccion" type="text" class="form-control" placeholder="{{data['direccion']}}">
+              </div>   
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">                
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fa fa-id-card"></i></span>
+                </div>
+                <input id="nit" type="text" class="form-control" placeholder="{{data['nit']}}">
+              </div>   
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">                
+              <div class="input-group">                
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fa fa-phone"></i></span>
+                </div>
+                <input id="telefono" type="text" class="form-control" placeholder="{{data['telefono']}}">
+              </div>   
+            </div>
+          </div>
+
+        </div>
+    
+    <div class="col-lg-12 col-md-12">
+      <div class="form-group">                
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fa fa-info-circle"></i></span>
+          </div>
+          <textarea class="form-control rounded-0" id="_descripcion" placeholder="{{data['descripcion']}}"></textarea>
+        </div>   
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 col-md-6">
+        <div class="form-group">                
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fa fa-industry"></i></span>
+            </div>            
+            <input type="mail" class="form-control" id="_usuario" placeholder="{{data['usuario']}}">
+          </div>   
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-4">
+        <div class="form-group">                
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fa fa-city"></i></span>
+            </div>
+            <select id="ciudad" required="" name="rol" class="custom-select mr-sm-2" id="ciudad">
+            </select>
+          </div>   
+        </div>
+      </div>  
+      <p id="ciuda">{{data['ciudad']}}</p>    
+    </div>
+            
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" onclick="actualizar_proveedor('{{data['id_usuario']}}','{{data['usuario']}}','{{data['empresa']}}','{{data['nit']}}','{{data['telefono']}}','{{data['direccion']}}','{{data['descripcion']}}','{{data['ciudad']}}','{{data['activo']}}')">Actualizar Proveedor</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      <button type="button" class="btn btn-warning btn-lg shiny" data-dismiss="modal" aria-hidden="true" style="display:none;">Cancel</button>
+    </div>
+</form>

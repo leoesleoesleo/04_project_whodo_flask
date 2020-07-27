@@ -1,0 +1,702 @@
+{% include 'incluidos/head.html' %}
+
+<script type="text/javascript">
+
+ $(document).ready(function() {
+    select_ciudad();      
+});
+
+function hide_modal_insert() {
+  $(".btn-warning").click();
+} 
+
+function mostrar_formulario_cliente() {
+  $("#formulario_cliente").show('fast', function(){
+  });
+}
+
+function ocultar_formulario_cliente() {
+  $("#formulario_cliente").hide('slow', function(){
+    });
+} 
+
+function mostrar_formulario_proveedor() {
+  $("#formulario_proveedor").show('fast', function(){
+  });
+}
+
+function ocultar_formulario_proveedor() {
+  $("#formulario_proveedor").hide('slow', function(){
+    });
+}
+
+function mostrar_formulario_generales() {
+  $("#generales").show('fast', function(){
+  });
+}
+
+function select_ciudad(){   
+    $.ajax({
+          url: '/listarselectciudad_logueo',
+          type: "POST",
+          beforeSend: show_loading(),
+          dataType: 'html',
+          headers: {
+                  'Access-Control-Allow-Origin': '*'
+              },
+          success: function(res){
+              $('select#ciudad').html(res);
+          hide_loading(); 
+          }, 
+          error: function(e) {
+          console.error(e);
+          $.notify("Error al cargar los datos","warn"); 
+      }
+    }); 
+}
+
+function modal_crearusuario() {
+  var nuevousuario = $('select#select_nuevousuario').val();
+  if (nuevousuario == "Cliente") {
+    mostrar_formulario_cliente();
+    ocultar_formulario_proveedor();
+    mostrar_formulario_generales(); 
+  } else if (nuevousuario == "Proveedor") {
+    ocultar_formulario_cliente();
+    mostrar_formulario_proveedor();
+    mostrar_formulario_generales(); 
+  }
+}
+
+function insert_usuario() {
+  var nuevousuario = $('select#select_nuevousuario').val();
+  if (nuevousuario == "Cliente") {
+    var nombre = $('input#nombre').val();
+    var apellido = $('input#appellido').val();
+    var cedula = $('input#cedula').val(); 
+    var fechan = $('input#fechan').val();      
+  } else if (nuevousuario == "Proveedor") {
+    var empresa = $('input#empresa').val();
+    var telefono = $('input#telefono').val();
+    var direccion = $('input#direccion').val();
+    var nit_empresa = $('input#nit_empresa').val();
+    var descripcion = $('textarea#descripcion').val();
+  }
+    var correo = $('input#correo').val();
+    var ciudad = $('select#ciudad').val();
+    var pais = $('input#pais').val();
+    var contraseña = $('input#contraseña').val();
+    var conf_contraseña = $('input#conf_contraseña').val(); 
+    var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
+
+
+  $("input#nombre").removeAttr("style");
+  $("input#appellido").removeAttr("style");
+  $("input#cedula").removeAttr("style");
+  $("input#correo").removeAttr("style");
+  $("input#fechan").removeAttr("style");
+  $("input#empresa").removeAttr("style");
+  $("input#telefono").removeAttr("style");
+  $("input#nit_empresa").removeAttr("style");
+  $("input#direccion").removeAttr("style");
+  $("textarea#descripcion").removeAttr("style");
+  $("select#ciudad").removeAttr("style");
+  $("input#pais").removeAttr("style");
+  $("input#contraseña").removeAttr("style");
+  $("input#conf_contraseña").removeAttr("style");
+
+   if (nuevousuario == "Cliente" && nombre == '') {
+      $.notify("El campo nombre es obligatorio", "warn");      
+      $("input#nombre").css({'border-color':'red'});
+      return;
+    }
+   if (nuevousuario == "Cliente" && apellido == '') {
+      $.notify("El campo apellido es obligatorio", "warn");      
+      $("input#appellido").css({'border-color':'red'});
+      return;
+    } 
+   if (nuevousuario == "Cliente" && cedula == '') {
+      $.notify("El campo cedula es obligatorio", "warn");      
+      $("input#cedula").css({'border-color':'red'});
+      return;
+    }
+   if (nuevousuario == "Cliente" && fechan == '') {        
+      $.notify("El campo fecha Nacimiento es obligatorio", "warn");      
+      $("input#fechan").css({'border-color':'red'});
+      return;
+    }
+   if (nuevousuario == "Proveedor" && empresa == '') {
+      $.notify("El campo empresa es obligatorio", "warn");      
+      $("input#empresa").css({'border-color':'red'});
+      return;
+    }
+   if (nuevousuario == "Proveedor" && telefono == '') {
+      $.notify("El campo telefono es obligatorio", "warn");      
+      $("input#telefono").css({'border-color':'red'});
+      return;
+    } 
+   if (nuevousuario == "Proveedor" && nit_empresa == '') {
+      $.notify("El campo nit_empresa es obligatorio", "warn");      
+      $("input#nit_empresa").css({'border-color':'red'});
+      return;
+    } 
+   if (nuevousuario == "Proveedor" && direccion == '') {
+      $.notify("El campo direccion es obligatorio", "warn");      
+      $("input#direccion").css({'border-color':'red'});
+      return;
+    } 
+   if (nuevousuario == "Proveedor" && descripcion == '') {
+      $.notify("El campo descripcion es obligatorio", "warn");      
+      $("textarea#descripcion").css({'border-color':'red'});
+      return;
+    }
+   if (ciudad == '-- Seleccione Ciudad --') {
+      $.notify("El campo ciudad es obligatorio", "warn");      
+      $("select#ciudad").css({'border-color':'red'});
+      return;
+    }  
+   if(!regex.test(correo.trim())) {
+      $.notify("El campo correo es una dirección no válida", "warn");      
+      $("input#correo").css({'border-color':'red'});
+      return;
+    }        
+   if (pais == '') {
+      $.notify("El campo pais es obligatorio", "warn");      
+      $("input#pais").css({'border-color':'red'});
+      return;
+    }
+   if (contraseña == '') {
+      $.notify("El campo contraseña es obligatorio", "warn");      
+      $("input#contraseña").css({'border-color':'red'});
+      return;
+    }
+   if (conf_contraseña == '') {
+      $.notify("El campo confirmar contraseña es obligatorio", "warn");     
+      $("input#conf_contraseña").css({'border-color':'red'});
+      return;
+    } 
+   if (contraseña != conf_contraseña){
+      $.notify("Los campos contraseñas deben ser iguales", "error");
+      return;
+   }
+  ///validar seguridad contraseña 
+  if (contraseña.length < 8 ) {
+    $.notify("El campo contraseña no cumple con los requisitos mínimos", "warn");  
+    $.notify("Debería tener 8 carácteres como mínimo", "info");        
+    $("input#contraseña").css({'border-color':'red'});
+    return;
+  }
+  if (!contraseña.match(/[A-z]/) ) {
+    $.notify("El campo contraseña no cumple con los requisitos mínimos", "warn");  
+    $.notify("Debería tener una letra como mínimo", "info");        
+    $("input#contraseña").css({'border-color':'red'});
+    return;
+  }
+  if (!contraseña.match(/[A-Z]/) ) {
+    $.notify("El campo contraseña no cumple con los requisitos mínimos", "warn");  
+    $.notify("Debería tener una letra mayúscula como mínimo", "info");        
+    $("input#contraseña").css({'border-color':'red'});
+    return;
+  }
+  if (!contraseña.match(/\d/) ) {
+    $.notify("El campo contraseña no cumple con los requisitos mínimos", "warn");  
+    $.notify("Al menos debería tener una numero", "info");    
+    $("input#contraseña").css({'border-color':'red'});
+    return;
+  }
+
+  if (nuevousuario == "Cliente") {
+    var datos = {
+          'rol'   :nuevousuario,
+          'nombre':nombre,
+          'apellido':apellido,
+          'cedula':cedula,
+          'correo':correo,
+          'ciudad':ciudad,
+          'direccion':'',
+          'contraseña':contraseña,
+          'telefono':'',
+          'descripcion':'',
+          'fechan':fechan
+          };
+  } else if (nuevousuario == "Proveedor") {
+    var datos = {
+          'rol'   :nuevousuario,
+          'nombre':empresa,
+          'apellido':'',
+          'cedula':nit_empresa,
+          'correo':correo,
+          'ciudad':ciudad,
+          'direccion':direccion,
+          'contraseña':contraseña,
+          'telefono':telefono,
+          'descripcion':descripcion,
+          'fechan':''
+          };
+  }
+  
+  console.log(datos);
+
+   $.ajax({
+      url: '/insert_usuario',
+      type: "POST",
+      data: datos,
+      beforeSend: show_loading(),
+      dataType: "text",
+      success: function(res){
+          if (res == 'RegistroInsert') {
+            $.notify("Usuario creado correctamente", "success");
+            hide_loading();                    
+            hide_modal_insert();
+            //alert('proceso ok');
+            //v_usuarios();                   
+          }
+          if (res == 'usuarioDuplicado') {
+            $.notify("Este usuario ya se encuentra registrado", "error");
+            hide_loading(); 
+          }
+          if (res == 'Error') {
+            $.notify("Hubo un error en el proceso", "error");
+            hide_loading();   
+          }             
+      },
+      error: function(e) {
+         console.error(e);
+         $.notify("Hubo un error en la petición del proceso", "error");
+         hide_loading();
+      }
+  });    
+
+}    
+   
+
+///LOGUEO
+$(document).ready(function(){       
+    $('input#pwd').keypress(function(e) {
+        if(e.keyCode==13){
+            logueo();
+        }
+    });                   
+    $('input#usuario').focus(); 
+});  
+    
+function logueo() {
+  $("input#usuario").removeAttr("style");
+  $("input#pwd").removeAttr("style");
+  
+  if ($('input#usuario').val()==""){
+        $.notify("Ingrese usuario", "error");        
+        $("input#usuario").css({'border-color':'red'});        
+        return;
+  }
+
+  if ($('input#pwd').val()==""){
+        $.notify("Ingrese contraseña", "error");
+        $("input#pwd").css({'border-color':'red'});
+        return;
+  }
+
+  var usuario=$('input#usuario').val();
+  var psw=$('input#pwd').val();
+  var params={'usuario':usuario,'psw':psw};
+  
+    $.ajax({
+        url: '/logueo',
+        data: params,
+        type: "POST",
+        beforeSend: show_loading(),     
+        dataType: "text",
+        success: function(datos){             
+            if (datos=='noExiste'){
+                  $.notify("El usuario no registra en la aplicación", "error");
+                 hide_loading();               
+           return;
+            }
+            if (datos=='desactivado'){
+                $.notify("El usuario se encuentra desactivado", "error");
+                hide_loading();
+           return;
+            }             
+            if (datos=='noLDAP'){
+                $.notify("No es posible la comunicación", "warn");
+                hide_loading();
+           return;
+            }                 
+            if (datos=='usuarioErroneo'){
+                $.notify("Nombre de usuario invalido, verifique la información de ingreso, valide su usuario.", "error");
+                hide_loading();                  
+           return;
+            }
+            if (datos=='PwdErroneo'){
+                $.notify("Contraseña invalido, verifique la información de ingreso, valide su contraseña.", "error");
+                hide_loading();                  
+           return;
+            }    
+            if (datos=='OK'){
+                 window.location.href = '/inicio',   
+                 $.notify("Usuario Correcto", "success");          
+            }
+          hide_loading();    
+        },
+        error: function(e) {
+          console.error(e);
+          $.notify("Error en la petición","error"); 
+        }
+    });        
+} 
+
+</script>
+
+
+<style type="text/css">
+    
+#body_logueo{
+background-color: rgb(255, 255, 255);
+}
+.Cell{
+padding-bottom: 10%; padding-top: 20%;
+}
+#imglog{
+margin: 0 auto;
+}
+#imglog2{
+  padding-bottom:50%; 
+  width:130%; 
+  border-left: 4px solid #002855;
+}
+#subt{
+font-family:Berlin Sans FB, Times New Roman,Georgia;
+display: inline-block;  font-size: 20px;
+color: #A5A5A5;
+}
+#pielog{
+color:#0B2161;font-weight: bold;
+font-size:13px; 
+}
+#logueo{
+  background-color: #002855 !important;
+}
+#logueo:hover{
+  background-color: #004694!important;
+}
+.img{
+width: 70%;
+padding-left: 5%;
+} 
+.Cell{
+margin-left: 10%;
+}
+}
+
+
+</style>
+
+<body id="body_logueo">    
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-md-6">
+                        <div class="Row">
+                            <div class="Cell">
+                                <img id="imglog" width="260" height="100" src="{{ url_for('static', filename='dist/img/logo_b.png') }}" >
+                                <center><p id="subt">Encuentra tu mejor opción !</p>
+                  
+                                <img id="loading" style="display:none;" class="img-fluid" src="static/dist/img/cargando.gif" width="80" height="10" alt=""> 
+       
+                                </center><!--<span class="fa fa-cubes" style="color:#D31606;"></span>-->
+                            </div>
+                        </div>                   
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-8 text-left"> 
+                                <div class="login-panel panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Iniciar Sesion</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <fieldset>
+                                            <div class="form-group">
+                                                <input class="form-control" placeholder="Correo Electrónico Registrado" name="login" type="email" id="usuario" autofocus>
+                                            </div>
+                                            <div class="form-group">
+                                                <input class="form-control" placeholder="Contraseña" name="clave" type="password" id="pwd" value="">
+                                            </div>
+                                            <!-- Change this to a button or input when using this as a form -->
+                                            <input id="logueo" class="btn btn-lg btn-primary btn-block" type="submit" name="enviar" value="Ingresar" id="button_logueo" onclick="logueo()">
+                                        </fieldset>
+                                    </div>
+                                    <br>
+                                    <a href="#" data-toggle="modal" data-target="#modal_reestablecerclave">¿Se te olvidó tu contraseña?</a><br>
+                                    <a href="#" data-toggle="modal" data-target="#modal_insert_usuario" >Crear una nueva cuenta</a>
+                                </div>
+                                <br>
+                                <br>
+                                <br>
+                                <br>
+                              <h5 id="pielog">COPYRIGHT © 2020 whodo</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <div class= "col-sm-6 col-md-6 container">
+                        <img id="imglog2" src="{{ url_for('static', filename='dist/img/orquestador.gif') }}">
+                </div>
+            </div>
+        </div>
+        <hr> 
+
+<!-- modal Insert usuario -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_insert_usuario">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nuevo Usuario</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+        <div class="card-body"> 
+          <div class="col-lg-12 col-md-12">
+              <div class="input-group-prepend">
+                <select id="select_nuevousuario" class="form-control" onchange="modal_crearusuario()" onclick="select_ciudad()">
+                    <option><font style="vertical-align: inherit;">-- Seleccione tipo --</font></option>
+                    <option><font style="vertical-align: inherit;">Cliente</font></option>
+                    <option><font style="vertical-align: inherit;">Proveedor</font></option>
+                </select>
+              </div>
+          </div>
+        </div>
+
+        <form class="form-horizontal">
+            
+            <div class="card-body" >
+            <span id="formulario_cliente" style="display:none;">  
+              <center><label style="font-size:20px;" class="col-sm-6 control-label">Cliente</label></center>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fas fa-user-plus"></i></span>
+                        </div>
+                        <input id="nombre" type="text" class="form-control" placeholder="Nombres">
+                      </div>   
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fas fa-user-plus"></i></span>
+                        </div>
+                        <input id="appellido" type="text" class="form-control" placeholder="Apellidos">
+                      </div>   
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fa fa-id-card"></i></span>
+                        </div>
+                        <input id="cedula" type="text" class="form-control" placeholder="Cédula">
+                      </div>   
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fa fa-calendar"></i></span>
+                        </div>
+                        <input id="fechan" type="date" class="form-control" placeholder="Fecha Nacimiento" title="Fecha Nacimiento">
+                      </div>  
+                    </div>
+                  </div>
+                </div>
+            </span>   
+
+            <span id="formulario_proveedor" style="display:none;">
+              <center><label style="font-size:20px;" class="col-sm-6 control-label">Proveedor</label></center>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fas fa-user-plus"></i></span>
+                        </div>
+                        <input id="empresa" type="text" class="form-control" placeholder="Nombre Empresa">
+                      </div>   
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fa fa-phone"></i></span>
+                        </div>
+                        <input id="telefono" type="text" class="form-control" placeholder="Telefóno">
+                      </div>   
+                    </div>
+                  </div>
+                </div>
+              
+                <div class="row">
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fa fa-id-card"></i></span>
+                        </div>
+                        <input id="nit_empresa" type="text" class="form-control" placeholder="Nit">
+                      </div>   
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fa fa-map"></i></span>
+                        </div>
+                        <input id="direccion" type="email" class="form-control" placeholder="Dirección">
+                      </div>   
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-12 col-md-12">
+                  <div class="form-group">                
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i class="fa fa-info-circle"></i></span>
+                      </div>
+                      <textarea class="form-control rounded-0" id="descripcion" placeholder="Descripción general de los productos/servicios a ofrecer" name="descripcion"></textarea>
+                    </div>   
+                  </div>
+                </div>
+            </span>
+
+            <span id="generales" style="display: none">
+                <div class="row">
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fa fa-city"></i></span>
+                        </div>
+                        <select required="" name="rol" class="custom-select mr-sm-2" id="ciudad">
+                        </select>
+                      </div>   
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fa fa-envelope"></i></span>
+                        </div>
+                        <input id="correo" type="email" class="form-control" placeholder="Correo">
+                      </div>   
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fa fa-unlock"></i></span>
+                        </div>
+                        <input id="contraseña" type="password" class="form-control" placeholder="Contraseña">
+                      </div>   
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6 col-md-6">
+                    <div class="form-group">                
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="fa fa-unlock"></i></span>
+                        </div>
+                        <input id="conf_contraseña" type="password" class="form-control" placeholder="Confirmar Contraseña">
+                      </div>   
+                    </div>
+                  </div>
+                </div>
+              </span>
+                
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" onclick="insert_usuario()">Crear Usuario</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+              <button type="button" class="btn btn-warning btn-lg shiny" data-dismiss="modal" aria-hidden="true" style="display:none;">Cancel</button>
+            </div>
+
+        </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- modal Recuperar Contraseña -->
+<div class="modal" tabindex="-1" role="dialog" id="modal_reestablecerclave">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Recuperar Contraseña</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>      
+      <form class="form-horizontal">
+      <div class="box-body">
+        <div class="col-lg-12 col-md-12">
+          <div class="form-group">                
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="fa fa-envelope"></i></span>
+              </div>
+              <input id="correo" type="email" class="form-control" placeholder="Correo">
+            </div>   
+          </div>
+        </div>
+      </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" onclick="insert_proceso()">Enviar restablecimiento de contraseña</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+    </div>
+
+    </form>
+
+    </div>
+  </div>
+</div>
+
+     
+    </body>
+
+{% include 'incluidos/footer.html' %}

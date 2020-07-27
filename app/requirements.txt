@@ -1,0 +1,12 @@
+Flask
+flask_restful
+flask_cors
+Flask-Mail
+sqlalchemy==1.2.7
+mysql.connector
+datetime
+argparse
+flask_mysqldb
+pandas
+Werkzeug==0.16.0
+xlrd

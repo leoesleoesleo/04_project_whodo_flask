@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'incluidos/head.html' %}
+
+  <script type="text/javascript">
+    
+    function v_bandeja() {   
+      var param = 'proveedor'
+        $.ajax({
+            url: '/v_bandeja',
+            data: {'param':param},
+            type: "post",
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido').html(res); 
+            hide_loading();                
+            }
+        });
+    }
+
+    function v_bandeja_cliente() {   
+       var param = 'cliente'
+        $.ajax({
+            url: '/v_bandeja',
+            data: {'param':param},
+            type: "post",
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido').html(res); 
+            hide_loading();                
+            }
+        });
+    }
+
+    function v_carrito_cliente(param,id_cliente,id_portafolio) {   
+      var param = param
+      if (param == 'carrito') {
+        hide_modal_insert();  
+      }
+
+      $.ajax({
+            url: '/v_carrito',
+            data: {'param':param,'id_cliente':id_cliente,'id_portafolio':id_portafolio},
+            type: "post",
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido').html(res); 
+            hide_loading();                         
+            }
+        });
+    }
+
+    function v_proveedor(param) {  
+    var param = param
+    if (param == 'none' || param == ''){ 
+        $.ajax({
+            url: '/v_proveedor',
+            type: "post",
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido').html(res); 
+            hide_loading();                
+            }
+        });
+    
+    } else if (param == 'portafolios'){
+      $.ajax({
+            url: '/v_proveedor',
+            type: "post",
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido').html(res); 
+                $("#portafolios").click();
+            hide_loading();                
+            }
+        });
+    }
+
+    }
+
+    function v_cliente() {   
+        $.ajax({
+            url: '/v_cliente',
+            type: "post",
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido').html(res); 
+            hide_loading();                
+            }
+        });
+    }
+
+    function v_admin_usuarios() {   
+        $.ajax({
+            url: '/v_admin_usuarios',
+            type: "post",
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido').html(res); 
+                hide_loading();                
+            }
+        });
+    }
+
+    function v_admin_proveedor() {   
+        $.ajax({
+            url: '/v_admin_proveedor',
+            type: "post",
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido').html(res); 
+                hide_loading();                
+            }
+        });
+    }
+
+    function v_admin_categorias() {   
+        $.ajax({
+            url: '/v_admin_categorias',
+            type: "post",
+            beforeSend: show_loading(),
+            dataType: "html",
+            success: function(res){
+                $('div#contenido').html(res); 
+                hide_loading();                
+            }
+        });
+    }
+    
+    function hide_modal_insert() {
+      $(".btn-warning").click();
+    } 
+
+function activar(param) {   
+  var param = param    
+  $('#inicio ').removeClass('nav-link active');  
+  $('#proveedor').removeClass('nav-link active');
+  $('#administrador').removeClass('nav-link active');
+  $('#admin_categorias').removeClass('nav-link active');
+  $('#salir').removeClass('nav-link active');
+  $('#cliente').removeClass('nav-link active');
+  $('#proveedor_bandeja').removeClass('nav-link active');
+
+  $('#inicio').addClass('nav-link');  
+  $('#proveedor').addClass('nav-link');
+  $('#administrador').addClass('nav-link');
+  $('#admin_categorias').addClass('nav-link');
+  $('#salir').addClass('nav-link');
+  $('#cliente').addClass('nav-link');
+  $('#proveedor_bandeja').addClass('nav-link');
+
+  if (param) {
+    $('#'+param+'').addClass('nav-link active');
+  }
+}
+
+function activar_sub_admin(param){
+  $('#proveedor').removeClass('nav-link active');
+  $('#admin_usuarios').removeClass('nav-link active');
+  $('#admin_proveedores').removeClass('nav-link active');
+  $('#proveedor_bandeja').removeClass('nav-link active');
+  $('#proveedor_misitio').removeClass('nav-link active');
+  $('#admin_categorias').removeClass('nav-link active');
+  $('#cliente_bandeja').removeClass('nav-link active');
+  $('#cliente_misitio').removeClass('nav-link active');
+  $('#cliente_carrito').removeClass('nav-link active');
+
+  $('#proveedor').addClass('nav-link');
+  $('#admin_usuarios').addClass('nav-link');
+  $('#admin_proveedores').addClass('nav-link');
+  $('#proveedor_bandeja').addClass('nav-link');
+  $('#proveedor_misitio').addClass('nav-link');
+  $('#admin_categorias').addClass('nav-link');
+  $('#cliente_bandeja').addClass('nav-link');
+  $('#cliente_misitio').addClass('nav-link');
+  $('#cliente_carrito').addClass('nav-link');
+
+  activar('administrador');
+  if (param) {
+    $('#'+param+'').addClass('nav-link active');
+  }
+}
+
+function activar_sub_cliente(param){  
+  $('#cliente').removeClass('nav-link active');
+  $('#admin_usuarios').removeClass('nav-link active');
+  $('#admin_proveedores').removeClass('nav-link active');
+  $('#admin_categorias').removeClass('nav-link active');
+  $('#proveedor_bandeja').removeClass('nav-link active');
+  $('#proveedor_misitio').removeClass('nav-link active');
+  $('#cliente_bandeja').removeClass('nav-link active');
+  $('#cliente_misitio').removeClass('nav-link active');
+  $('#cliente_carrito').removeClass('nav-link active');  
+
+  $('#cliente').addClass('nav-link');  
+  $('#admin_usuarios').addClass('nav-link');
+  $('#admin_proveedores').addClass('nav-link');
+  $('#admin_categorias').addClass('nav-link');
+  $('#proveedor_bandeja').addClass('nav-link');
+  $('#proveedor_misitio').addClass('nav-link');
+  $('#cliente_bandeja').addClass('nav-link');
+  $('#cliente_misitio').addClass('nav-link');
+  $('#cliente_carrito').addClass('nav-link');
+
+  activar('cliente');
+  if (param) {
+    $('#'+param+'').addClass('nav-link active');
+  }
+}
+
+function activar_sub_proveedor(param){  
+  $('#administrador').removeClass('nav-link active');
+  $('#admin_usuarios').removeClass('nav-link active');
+  $('#admin_proveedores').removeClass('nav-link active');
+  $('#proveedor_bandeja').removeClass('nav-link active');
+  $('#proveedor_misitio').removeClass('nav-link active');
+  $('#admin_categorias').removeClass('nav-link active');
+  $('#cliente_bandeja').removeClass('nav-link active');
+  $('#cliente_misitio').removeClass('nav-link active');
+  $('#cliente_carrito').removeClass('nav-link active');
+
+  $('#administrador').addClass('nav-link');
+  $('#admin_usuarios').addClass('nav-link');
+  $('#admin_proveedores').addClass('nav-link');
+  $('#proveedor_bandeja').addClass('nav-link');
+  $('#proveedor_misitio').addClass('nav-link');
+  $('#admin_categorias').addClass('nav-link');
+  $('#cliente_bandeja').addClass('nav-link');
+  $('#cliente_misitio').addClass('nav-link');
+  $('#cliente_carrito').addClass('nav-link');
+
+  activar('proveedor');
+  if (param) {
+    $('#'+param+'').addClass('nav-link active');
+  }
+}
+
+function salir(){
+  window.location.href = '/logout'
+}
+
+  </script>
+
+
+<body class="">
+  
+<div class="wrapper">
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+      </li>
+    </ul>
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <!--<h6 style="font-size:20px; color:#AEAEAE;">Proveedor <span class="fa fa-industry"></span></h6>-->
+      </li>
+    </ul>
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <img id="loading" style="padding-left:50%;display:none;" class="img-fluid" src="static/dist/img/cargando.gif" width="150" height="10" alt="">
+      </li>
+    </ul>
+
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item dropdown">
+        <strong><h5 class="m-0 text-dark">bienvenido: <span id="session">{{session['nombres']}}</span></h5></strong>
+      </li>
+    </ul>
+
+  </nav>
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar elevation-4 sidebar-light-primary">
+    <!-- Brand Logo -->
+    <center><a href="#" class="brand-link" onclick="rederpagina()">
+      <img width="60" height="20" src="{{ url_for('static', filename='dist/img/logo_b.png') }}">    
+    </a>
+    </center>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <li class="nav-item">
+            <a id="inicio" href="#" onclick="rederpagina();activar('inicio');" class="nav-link active">
+              <i class="fa fa-tv" style="color:#D31606; font-size:20px;"></i>
+              <p>
+                Inicio
+              </p>
+            </a>
+          </li>
+          {% if session['rol'] == "proveedor" or session['rol'] == "super" %}
+          <li class="nav-item">
+            <a id="proveedor" href="#" onclick="activar('proveedor');" class="nav-link">
+              <i class="fa fa-industry" style="color:#D31606; font-size:20px;"></i>
+              <p>
+                Proveedor
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a id="proveedor_misitio" href="#" onclick="v_proveedor('none');activar_sub_proveedor('proveedor_misitio');" class="nav-link">
+                  <i class="fa fa-cubes"></i>
+                  <p>Mi sitio</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a id="proveedor_bandeja" href="#" onclick="v_bandeja('none');activar_sub_proveedor('proveedor_bandeja');" class="nav-link">
+                  <i class="fa fa-bell"></i>
+                  <p>Bandeja</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          {% endif %} 
+          {% if session['rol'] == "cliente" or session['rol'] == "super" %}   
+          <li class="nav-item">
+            <a id="cliente" href="#" onclick="activar('cliente');" class="nav-link">
+              <i class="fa fa-user-secret" style="color:#D31606; font-size:20px;"></i>
+              <p>
+                Cliente
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a id="cliente_misitio" href="#" onclick="v_cliente();activar_sub_cliente('cliente_misitio')" class="nav-link">
+                  <i class="fa fa-cubes"></i>
+                  <p>Mi sitio</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a id="cliente_carrito" href="#" onclick="v_carrito_cliente('none');activar_sub_cliente('cliente_carrito');" class="nav-link">
+                  <i class="fa fa-cart-plus"></i>
+                  <p>Carrito</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a id="cliente_bandeja" href="#" onclick="v_bandeja_cliente('none');activar_sub_cliente('cliente_bandeja');" class="nav-link">
+                  <i class="fa fa-bell"></i>
+                  <p>Bandeja</p>
+                </a>
+              </li>
+            </ul>
+          </li> 
+          {% endif %}  
+          {% if session['rol'] == "admin" or session['rol'] == "super" %}
+          <li class="nav-item">
+            <a id="administrador" href="#" onclick="activar('administrador');" class="nav-link">
+              <i class="fa fa-cog" style="color:#D31606; font-size:20px;"></i>
+              <p>
+                Administrador
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a id="admin_usuarios" href="#" onclick="v_admin_usuarios();activar_sub_admin('admin_usuarios');" class="nav-link">
+                  <i class="fa fa-users"></i>
+                  <p>Cliente</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a id="admin_proveedores" href="#" onclick="v_admin_proveedor();activar_sub_admin('admin_proveedores')" class="nav-link">
+                  <i class="fa fa-industry"></i>
+                  <p>Proveedor</p>
+                </a>
+              </li>
+            </ul> 
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a id="admin_categorias" href="#" onclick="v_admin_categorias();activar_sub_admin('admin_categorias')" class="nav-link">
+                  <i class="fa fa-table"></i>
+                  <p>Categoria</p>
+                </a>
+              </li>
+            </ul> 
+          </li> 
+          {% endif %} 
+          <li class="nav-item">
+            <a id="salir" href="#" onclick="salir();activar('salir');" class="nav-link">
+              <i class="fa fa-arrow-circle-right" style="color:#D31606; font-size:20px;"></i>
+              <p>
+                Salir
+              </p>
+            </a>
+          </li> 
+        </ul>        
+      </nav>
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+  
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper" id="contenido">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Inicio <span class="fa fa-tv" style="color:#D31606;"></span></h1>
+          </div>
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3></h3>
+
+                <p>Encuentra tu mejor proveedor</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-industry"></i>
+              </div>
+              {% if session['rol'] == "admin" %}
+              <a href="#" class="small-box-footer" onclick="v_cliente()">Más info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %} 
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3></h3>
+
+                <p>Mis Solicitudes</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-envelope"></i>
+              </div>
+              {% if session['rol'] == "admin" %}
+              <a href="#" class="small-box-footer" onclick="">Más info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %} 
+            </div>
+          </div>
+          
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+              <div class="inner">
+                <h3></h3>
+
+                <p>Mis Catálogos</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-cube"></i>
+              </div>
+              {% if session['rol'] == "admin" %}
+              <a href="#" class="small-box-footer" onclick="">Más info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %} 
+            </div>
+          </div>
+          <!-- ./col -->
+
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3></h3>
+
+                <p>Usuarios</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-person-add"></i>
+              </div>
+              {% if session['rol'] == "admin" %}
+              <a href="#" class="small-box-footer" onclick="v_usuarios();" >Más info <i class="fas fa-arrow-circle-right"></i></a>
+              {% endif %} 
+            </div>
+          </div>
+          <!-- ./col -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <strong>Copyright &copy;2020 <a href="http://adminlte.io">Whodo</a>.</strong>
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 1.0.0
+    </div>
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+
+</body>
+<!-- ./wrapper -->
+
+{% include 'incluidos/footer.html' %}
+
+</html>
+

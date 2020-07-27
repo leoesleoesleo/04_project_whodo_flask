@@ -1,0 +1,61 @@
+<table class="table table-striped table-bordered table-hover" id="dataTables-proveedores">
+  <thead>
+    <tr style="font-size: 10px;">
+      <th>Op</th>
+      <th>Usuario</th>
+      <th>Empresa</th>
+      <th>Nit</th>
+      <th>Telefono</th>                                   
+      <th>Dirección</th>                                  
+      <th>Descripción</th>
+      <th>Ciudad</th>
+      <th>Calificación</th>                                                          
+  </tr>
+  </thead>
+  <tbody> 
+    {% for row in data['data_proveedor'] %}
+    <tr style="font-size: 10px;">
+      <td>
+      	<!--
+        <a style="color:orange;font-size:13px;" href="/update/{{row.0}}" class="fa fa-edit" title="Actualizar" data-toggle="modal" data-target="#modal_update" onclick="modal_update_usuario('{{row[0]}}','{{row[1]}}','{{row[2]}}','{{row[3]}}','{{row[4]}}','{{row[5]}}','{{row[6]}}','{{row[7]}}','{{row[8]}}')"></a>
+        -->
+          	  
+      <a style="color:green;font-size:13px;" href="/update/{{row.0}}" class="fa fa-eye" title="Ver Portafolios" data-toggle="modal" data-target="#modal_carrito" onclick="modal_verportafolios('{{row[0]}}')"></a>
+      
+      </td>
+      <td>{{row[1]}}</td>
+      <td>{{row[2]}}</td>
+      <td>{{row[3]}}</td>
+      <td>{{row[4]}}</td>
+      <td>{{row[5]}}</td>
+      <td>{{row[6]}}</td>
+      <td>{{row[7]}}</td>
+      <td>
+        {% if row[8] == 1 %}
+          <img class="img-fluid" src="static/dist/img/estrellas_1.png" width="120" height="40">
+        {% endif %}  
+        {% if row[8] == 2 %}
+          <img class="img-fluid" src="static/dist/img/estrellas_2.png" width="120" height="40">
+        {% endif %}  
+        {% if row[8] == 3 %}
+          <img class="img-fluid" src="static/dist/img/estrellas_3.png" width="120" height="40">  
+        {% endif %}  
+        {% if row[8] == 4 %}
+          <img class="img-fluid" src="static/dist/img/estrellas_4.png" width="120" height="40"> 
+        {% endif %}  
+        {% if row[8] == 5 %}
+          <img class="img-fluid" src="static/dist/img/estrellas_5.png" width="120" height="40">   
+        {% endif %} 
+      </td>
+    </tr>
+    {% endfor %}  
+  </tbody>
+</table>
+
+<script>
+    $(document).ready(function() {
+        $('#dataTables-proveedores').DataTable({
+        responsive: true
+        });
+    });
+</script>
