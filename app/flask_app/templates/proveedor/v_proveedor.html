@@ -416,7 +416,7 @@
                 <ul class="nav nav-pills ml-auto p-2">
                   <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab" id="cargarproductos">Cargar Productos</a></li>
                   <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab" id="portafolios">Portafolios</a></li>
-                  <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" id="categoria">Sugerir Categorias</a></li>
+                  <!--<li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab" id="categoria">Sugerir Categorias</a></li>-->
                 </ul>
               </div><!-- /.card-header -->
               <div class="card-body">
@@ -450,8 +450,9 @@
                                                         Examinar… <input style="display: none;" multiple="" type="file" onchange="mostrarArchivo()" id="inputArchivoCargaVentasHide" name="inputArchivoCargaVentasHide">
                                                     </span>
                                                   </label>
-                                                  <input class="form-control" readonly="" type="text" size="50" id="inputArchivoCargaVentas">              
-                                                </div>                                                    
+                                                  <input class="form-control" readonly="" type="text" size="50" id="inputArchivoCargaVentas">  
+                                                </div>
+                                                <a href="/ficheros/plantilla.xlsx" download="plantilla" target="_blank" style="text-decoration: underline;">Descargar Formato</a>                                                       
                                               </div>  
 
                                               <!--  
@@ -501,14 +502,14 @@
                                                               <td>{{row[1]}}</td>
                                                               <td>{{row[2]}}</td>
                                                               <td>{{row[3]}}</td>
-                                                              <td>{{row[4]}}</td>
+                                                              <td>{{row[4].replace('[{', '').replace('}]', '').replace(',', '|').replace('"', '')}}</td>
                                                               <td>{{row[5]}}</td>
                                                               <td>{{row[6]}}
                                                                 {% if row[6] == "activo" %}
-                                                                  <span class="fa fa-toggle-on" style="color:green;font-size:13px;"></span>
+                                                                  <!--<span class="fa fa-toggle-on" style="color:green;font-size:13px;"></span>-->
                                                                 {% endif %}  
                                                                 {% if row[6] == "inactivo" %}
-                                                                  <span class="fa fa-toggle-off" style="color:red;font-size:13px;"></span>
+                                                                  <!--<span class="fa fa-toggle-off" style="color:red;font-size:13px;"></span>-->
                                                                 {% endif %} 
                                                               </td>  
                                                             </tr>
