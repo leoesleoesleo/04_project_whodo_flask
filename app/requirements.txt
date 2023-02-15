@@ -8,5 +8,5 @@ datetime
 argparse
 flask_mysqldb
 pandas
-Werkzeug==0.16.0
+Werkzeug==2.2.3
 xlrd
